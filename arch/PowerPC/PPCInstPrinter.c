@@ -461,11 +461,8 @@ static void printU12ImmOperand(MCInst *MI, unsigned OpNo, SStream *O)
 static void printS16ImmOperand(MCInst *MI, unsigned OpNo, SStream *O)
 {
 	if (MCOperand_isImm(MCInst_getOperand(MI, OpNo))) {
-		unsigned short Imm = (unsigned short)MCOperand_getImm(MCInst_getOperand(MI, OpNo));
-        if (Imm > HEX_THRESHOLD)
-            SStream_concat(O, "0x%x", Imm);
-        else
-            SStream_concat(O, "%u", Imm);
+		short Imm = (short)MCOperand_getImm(MCInst_getOperand(MI, OpNo));
+		SStream_concat(O, "%d", Imm);
 
 		if (MI->csh->detail) {
 			MI->flat_insn->detail->ppc.operands[MI->flat_insn->detail->ppc.op_count].type = PPC_OP_IMM;
@@ -938,7 +935,8 @@ static char *printAliasInstrEx(MCInst *MI, SStream *OS, void *info)
 			}
 
 			cr = getBICR(MCOperand_getReg(MCInst_getOperand(MI, 1)));
-			if (cr > PPC_CR0) {
+// RetDec fix
+			if (cr >= PPC_CR0) {
 				if (MI->csh->detail) {
 					MI->flat_insn->detail->ppc.operands[MI->flat_insn->detail->ppc.op_count].type = PPC_OP_CRX;
 					MI->flat_insn->detail->ppc.operands[MI->flat_insn->detail->ppc.op_count].crx.scale = 4;
